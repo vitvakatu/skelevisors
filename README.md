@@ -13,7 +13,18 @@ Skeleton tracking using ROS
 - OpenNI_tracker
 - NITE
 - Darwin robot
-- ROSfurfurfur (нам нужно больше пунктов)
+
+## Используемые ROS-пакеты
+- ros-gazebo
+- darwin-gazebo
+
+# Startup schedule
+```
+roslaunch openni_launch openni.launch
+rosrun openni_tracker openni_tracker
+roslaunch darwin_gazebo darwin_gazebo.launch
+rosrun skeleton subscriber.py 
+```
 
 # Описание
 Кажую неделю мы приходим на кафедру и пытаемся что-то запустить, используя устаревшие туториалы и копируя чужой код. В будущем, мы надеемся управлять роботом Darwin с помощью тела человека (используя Kinect). Надеемся успеть до конца семестра, но не гарантируем.
