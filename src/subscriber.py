@@ -11,6 +11,7 @@ import turtlesim.srv
 from darwin_gazebo.darwin import Darwin
 
 shoulder_coord = (0.0, 0.0, 0.0)
+hand_coord = (0.0, 0.0, 0.0)
 elbow_coord = (0.0, 0.0, 0.0)
 
 def sub(s, f):
@@ -27,21 +28,43 @@ def angle(v):
 	theta = math.acos(x / math.sqrt(y ** 2 + x ** 2))
 	return (phi, theta)
 
+def angle_vectors(v1, v2):
+	up = v1[0] * v2[0] + v1[1] * v2[1] + v1[2] * v2[2]
+	down = math.sqrt(v1[0] ** 2 + v1[1] ** 2 + v1[2] ** 2)
+	down = down * math.sqrt(v2[0] ** 2 + v2[1] ** 2 + v2[2] ** 2)
+	return math.acos(up / down)
+
 
 def callback(data):
 	global hand_coord
 	global shoulder_coord
+	global elbow_coord
 	for tr in data.transforms:
 		if tr.child_frame_id.startswith('left_hand'):
 			translation = tr.transform.translation
-			elbow_coord = (translation.x, translation.y, translation.z)
+			hand_coord = (translation.y, translation.x, translation.z)
 		if tr.child_frame_id.startswith('left_shoulder'):
 			translation = tr.transform.translation
-			elbow_coord = (translation.x, translation.y, translation.z)
+			shoulder_coord = (translation.y, translation.x, translation.z)
+		if tr.child_frame_id.startswith('left_elbow'):
+			translation = tr.transform.translation
+			elbow_coord = (translation.y, translation.x, translation.z)
 
 	print(shoulder_coord)
+	print(elbow_coord)
 	print(hand_coord)
-	
+
+	relative_elbow = sub(shoulder_coord, elbow_coord)
+	relative_hand = sub(shoulder_coord, hand_coord)
+
+	(phi_elbow, theta_elbow) = angle(relative_elbow)
+
+	elbow_to_hand = sub(relative_elbow, relative_hand)
+	angle_elbow_to_hand = angle_vectors(elbow_to_hand, relative_elbow)
+
+	print(sub(shoulder_coord, hand_coord))
+
+	print('(Phi, Theta): ', angle(sub(shoulder_coord, hand_coord)))
 
 if __name__ == '__main__':
 	rospy.init_node("walker_demo", anonymous=True)
