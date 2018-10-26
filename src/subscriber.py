@@ -23,29 +23,25 @@ def angle(v):
 	x = v[0] * 100
 	y = v[1] * 100
 	z = v[2] * 100
-	phi = math.atan(x / math.sqrt(z ** 2 + y ** 2))
-	theta = math.acos(z / math.sqrt(y ** 2 + z ** 2))
+	phi = math.atan(z / math.sqrt(x ** 2 + y ** 2))
+	theta = math.acos(x / math.sqrt(y ** 2 + x ** 2))
 	return (phi, theta)
 
 
 def callback(data):
+	global hand_coord
 	global shoulder_coord
-	global elbow_coord
 	for tr in data.transforms:
-		if tr.child_frame_id.startswith('left_elbow'):
+		if tr.child_frame_id.startswith('left_hand'):
 			translation = tr.transform.translation
 			elbow_coord = (translation.x, translation.y, translation.z)
 		if tr.child_frame_id.startswith('left_shoulder'):
 			translation = tr.transform.translation
-			shoulder_coord = (translation.x, translation.y, translation.z)
+			elbow_coord = (translation.x, translation.y, translation.z)
 
 	print(shoulder_coord)
-	print(elbow_coord)
+	print(hand_coord)
 	
-	print(sub(shoulder_coord, elbow_coord))
-	print('Length: ', length(sub(shoulder_coord, elbow_coord)))
-	
-	print('(Phi, Theta): ', angle(sub(shoulder_coord, elbow_coord)))
 
 if __name__ == '__main__':
 	rospy.init_node("walker_demo", anonymous=True)
