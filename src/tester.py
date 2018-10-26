@@ -15,20 +15,13 @@ if __name__ == '__main__':
 	darwin = Darwin()
 	rospy.loginfo("Darwin initialization finished")
 	print("Hello")
-	
-	rospy.sleep(1)
 
-	darwin.set_angles({"j_high_arm_l": -2})
-	
-	rospy.sleep(1)
-	print("Hello")
+	while True:
+		x = input()
+		if x == 555:
+			break
+		darwin.set_angles({"j_high_arm_l": x})
 
-	darwin.set_angles({"j_tilt": 0})
-
-	rospy.sleep(1)
-	print("Hello")
-
-	darwin.set_angles({"j_tilt": -1})
 	
 
 
