@@ -50,10 +50,6 @@ def callback(data):
 			translation = tr.transform.translation
 			elbow_coord = (translation.y, translation.x, translation.z)
 
-	print(shoulder_coord)
-	print(elbow_coord)
-	print(hand_coord)
-
 	relative_elbow = sub(shoulder_coord, elbow_coord)
 	relative_hand = sub(shoulder_coord, hand_coord)
 
@@ -62,9 +58,13 @@ def callback(data):
 	elbow_to_hand = sub(relative_elbow, relative_hand)
 	angle_elbow_to_hand = angle_vectors(elbow_to_hand, relative_elbow)
 
-	print(sub(shoulder_coord, hand_coord))
-
-	print('(Phi, Theta): ', angle(sub(shoulder_coord, hand_coord)))
+	print('Rel.elbow ', relative_elbow)
+	print('Rel.hand ', relative_hand)
+	print('El 2 hand ', elbow_to_hand)
+	print('Angle2hand ', angle_elbow_to_hand)
+	print('Phi ', phi_elbow)
+	print('Theta ', theta_elbow)
+	print(' ')
 
 if __name__ == '__main__':
 	rospy.init_node("walker_demo", anonymous=True)
