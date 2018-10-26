@@ -13,6 +13,7 @@ Skeleton tracking using ROS
 - OpenNI_tracker
 - NITE
 - Darwin robot
+- https://github.com/avin2/SensorKinect 
 
 ## Используемые ROS-пакеты
 - ros-gazebo
@@ -23,7 +24,7 @@ Skeleton tracking using ROS
 roslaunch openni_launch openni.launch
 rosrun openni_tracker openni_tracker
 roslaunch darwin_gazebo darwin_gazebo.launch
-rosrun skeleton subscriber.py 
+rosrun skelevisors subscriber.py 
 ```
 
 # Описание
