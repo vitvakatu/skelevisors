@@ -8,6 +8,7 @@ import math
 import geometry_msgs.msg as msgs
 import turtlesim.srv
 from darwin_gazebo.darwin import Darwin
+import vectormath as v
 
 if __name__ == '__main__':
 	rospy.init_node("walker_demo", anonymous=True)
@@ -18,9 +19,13 @@ if __name__ == '__main__':
 
 	while True:
 		x = input()
+		y = input()
+		z = input()
 		if x == 555:
 			break
-		darwin.set_angles({"j_high_arm_l": x})
+		darwin.set_angles({"j_shoulder_l": x})
+		darwin.set_angles({"j_high_arm_l": y})
+		darwin.set_angles({"j_low_arm_l": z})
 
 	
 

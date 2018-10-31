@@ -10,9 +10,12 @@ import geometry_msgs.msg as msgs
 import turtlesim.srv
 from darwin_gazebo.darwin import Darwin
 
-shoulder_coord = (0.0, 0.0, 0.0)
-hand_coord = (0.0, 0.0, 0.0)
-elbow_coord = (0.0, 0.0, 0.0)
+shoulder_coord_l = (0.0, 0.0, 0.0)
+hand_coord_l = (0.0, 0.0, 0.0)
+elbow_coord_l = (0.0, 0.0, 0.0)
+shoulder_coord_r = (0.0, 0.0, 0.0)
+hand_coord_r = (0.0, 0.0, 0.0)
+elbow_coord_r = (0.0, 0.0, 0.0)
 
 def sub(s, f):
 	return (f[0] - s[0], f[1] - s[1], f[2] - s[2])
@@ -47,59 +50,97 @@ def translate(value, leftMin, leftMax, rightMin, rightMax):
 
 
 def callback(data, darwin):
-	global hand_coord
-	global shoulder_coord
-	global elbow_coord
+	global hand_coord_l
+	global shoulder_coord_l
+	global elbow_coord_l
+	global hand_coord_r
+	global shoulder_coord_r
+	global elbow_coord_r
 	for tr in data.transforms:
 		if tr.child_frame_id.startswith('left_hand'):
 			translation = tr.transform.translation
-			hand_coord = (translation.y, translation.x, translation.z)
+			hand_coord_l = (translation.y, translation.x, translation.z)
 		if tr.child_frame_id.startswith('left_shoulder'):
 			translation = tr.transform.translation
-			shoulder_coord = (translation.y, translation.x, translation.z)
+			shoulder_coord_l = (translation.y, translation.x, translation.z)
 		if tr.child_frame_id.startswith('left_elbow'):
 			translation = tr.transform.translation
-			elbow_coord = (translation.y, translation.x, translation.z)
+			elbow_coord_l = (translation.y, translation.x, translation.z)
+		if tr.child_frame_id.startswith('right_hand'):
+			translation = tr.transform.translation
+			hand_coord_r = (translation.y, translation.x, translation.z)
+		if tr.child_frame_id.startswith('right_shoulder'):
+			translation = tr.transform.translation
+			shoulder_coord_r = (translation.y, translation.x, translation.z)
+		if tr.child_frame_id.startswith('right_elbow'):
+			translation = tr.transform.translation
+			elbow_coord_r = (translation.y, translation.x, translation.z)
 
-	relative_elbow = sub(shoulder_coord, elbow_coord)
-	relative_hand = sub(shoulder_coord, hand_coord)
+	relative_elbow_l = sub(shoulder_coord_l, elbow_coord_l)
+	relative_hand_l = sub(shoulder_coord_l, hand_coord_l)
+	relative_elbow_r = sub(shoulder_coord_r, elbow_coord_r)
+	relative_hand_r = sub(shoulder_coord_r, hand_coord_r)
 
-	(phi_elbow, theta_elbow) = angle(relative_elbow)
+	(phi_elbow, theta_elbow) = angle(relative_elbow_l)
 
-	elbow_to_hand = sub(relative_elbow, relative_hand)
-	angle_elbow_to_hand = angle_vectors(elbow_to_hand, relative_elbow)
+	elbow_to_hand_l = sub(relative_elbow_l, relative_hand_l)
+	angle_elbow_to_hand_l = angle_vectors(elbow_to_hand_l, relative_elbow_l)
+	elbow_to_hand_r = sub(relative_elbow_r, relative_hand_r)
+	angle_elbow_to_hand_r = angle_vectors(elbow_to_hand_r, relative_elbow_r)
 
-	print('Rel.elbow ', relative_elbow)
-	print('Rel.hand ', relative_hand)
-	print('El 2 hand ', elbow_to_hand)
-	print('Angle2hand ', angle_elbow_to_hand)
+	print('Rel.elbow ', relative_elbow_l)
+	print('Rel.hand ', relative_hand_l)
+	print('El 2 hand ', elbow_to_hand_l)
+	print('Angle2hand ', angle_elbow_to_hand_l)
 	print('Phi ', phi_elbow)
 	print('Theta ', theta_elbow)
 
-	elbow_to_z = math.asin(math.sqrt(elbow_to_hand[0] ** 2 + elbow_to_hand[1] ** 2) / math.sqrt(elbow_to_hand[0] ** 2 + elbow_to_hand[1] ** 2 + elbow_to_hand[2] ** 2)).real
-	print('ELBOW_TO_Z: ', elbow_to_z)
+	elbow_to_axis_z_l = math.acos(relative_elbow_l[2] / math.sqrt(relative_elbow_l[0] ** 2 + relative_elbow_l[1] ** 2 + relative_elbow_l[2] ** 2)).real -0.25
+	elbow_to_axis_y_l = math.acos(relative_elbow_l[0] / math.sqrt(relative_elbow_l[0] ** 2 + relative_elbow_l[1] ** 2 + relative_elbow_l[2] ** 2)).real
+	if relative_elbow_l[2] < 0:
+		elbow_to_axis_y_l = -elbow_to_axis_y_l
+
+	elbow_to_axis_z_r = math.acos(relative_elbow_r[2] / math.sqrt(relative_elbow_r[0] ** 2 + relative_elbow_r[1] ** 2 + relative_elbow_r[2] ** 2)).real +0.25
+	elbow_to_axis_y_r = math.acos(relative_elbow_r[0] / math.sqrt(relative_elbow_r[0] ** 2 + relative_elbow_r[1] ** 2 + relative_elbow_r[2] ** 2)).real
+	if relative_elbow_r[2] < 0:
+		elbow_to_axis_y_r = -elbow_to_axis_y_r
+
+	print('ELBOW_TO_Z: ', elbow_to_axis_z_l)
+	print('ELBOW_TO_Y: ', elbow_to_axis_y_l)
+
+	shoulder_l = -(3.14 - elbow_to_axis_y_l)
+	high_arm_l = 1.57 - elbow_to_axis_z_l
+	shoulder_r = -(3.14 - elbow_to_axis_y_r)
+	high_arm_r = 1.57 - elbow_to_axis_z_r
+	print('Shoulder L: ', shoulder_l)
+	print('HighArm L: ', high_arm_l)
+	print('Shoulder R: ', shoulder_r)
+	print('HighArm R: ', high_arm_r)
 	print(' ')
 
-	if angle_elbow_to_hand > 1.75:
+	darwin.set_angles({"j_shoulder_l": shoulder_l})
+
+	darwin.set_angles({"j_high_arm_l": high_arm_l})
+
+	darwin.set_angles({"j_shoulder_r": shoulder_r})
+
+	darwin.set_angles({"j_high_arm_r": high_arm_r})
+
+	if angle_elbow_to_hand_l > 1.75:
 		darwin.set_angles({"j_low_arm_l": -1.5})
-	elif angle_elbow_to_hand < 0.25:
+	elif angle_elbow_to_hand_l < 0.25:
 		darwin.set_angles({"j_low_arm_l": 0})
 	else:
-		darwin.set_angles({"j_low_arm_l": -(angle_elbow_to_hand - 0.25)})
-	
-	if phi_elbow > 1.33:
-		darwin.set_angles({"j_high_arm_l": -1.5})
-	elif phi_elbow < -1.2:
-		darwin.set_angles({"j_high_arm_l": 1.5})
+		darwin.set_angles({"j_low_arm_l": -(angle_elbow_to_hand_l - 0.25)})
+
+	if angle_elbow_to_hand_r > 1.75:
+		darwin.set_angles({"j_low_arm_r": -1.5})
+	elif angle_elbow_to_hand_r < 0.25:
+		darwin.set_angles({"j_low_arm_r": 0})
 	else:
-		darwin.set_angles({"j_high_arm_l": -translate(phi_elbow, -1.2, 1.33, -1.5, 1.5)})
+		darwin.set_angles({"j_low_arm_r": -(angle_elbow_to_hand_r - 0.25)})
+
 	
-	if elbow_to_z > 1.75:
-		darwin.set_angles({"j_shoulder_l": -1.5})
-	elif elbow_to_z < 0.25:
-		darwin.set_angles({"j_shoulder_l": 0})
-	else:
-		darwin.set_angles({"j_shoulder_l": -elbow_to_z})
 
 
 if __name__ == '__main__':
