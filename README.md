@@ -21,7 +21,7 @@ Skeleton tracking using ROS
 
 # Startup schedule
 ```
-roslaunch openni_launch openni.launch
+roslaunch openni_launch openni.launch device_id:=#2 depth_registration:=true
 rosrun openni_tracker openni_tracker
 roslaunch darwin_gazebo darwin_gazebo.launch
 rosrun skelevisors subscriber.py 
