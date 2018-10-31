@@ -9,6 +9,7 @@ import cmath as math
 import geometry_msgs.msg as msgs
 import turtlesim.srv
 from darwin_gazebo.darwin import Darwin
+from tf.transformations import euler_from_quaternion
 
 shoulder_coord_l = (0.0, 0.0, 0.0)
 hand_coord_l = (0.0, 0.0, 0.0)
@@ -16,6 +17,7 @@ elbow_coord_l = (0.0, 0.0, 0.0)
 shoulder_coord_r = (0.0, 0.0, 0.0)
 hand_coord_r = (0.0, 0.0, 0.0)
 elbow_coord_r = (0.0, 0.0, 0.0)
+head = (0.0, 0.0, 0.0, 0.0)
 
 def sub(s, f):
 	return (f[0] - s[0], f[1] - s[1], f[2] - s[2])
@@ -56,6 +58,7 @@ def callback(data, darwin):
 	global hand_coord_r
 	global shoulder_coord_r
 	global elbow_coord_r
+	global head
 	for tr in data.transforms:
 		if tr.child_frame_id.startswith('left_hand'):
 			translation = tr.transform.translation
@@ -75,7 +78,9 @@ def callback(data, darwin):
 		if tr.child_frame_id.startswith('right_elbow'):
 			translation = tr.transform.translation
 			elbow_coord_r = (translation.y, translation.x, translation.z)
-			
+		if tr.child_frame_id.startswith('head'):
+			rotation = tr.transform.rotation
+			head = euler_from_quaternion((rotation.w, rotation.x, rotation.y, rotation.z))
 
 	relative_elbow_l = sub(shoulder_coord_l, elbow_coord_l)
 	relative_hand_l = sub(shoulder_coord_l, hand_coord_l)
@@ -127,6 +132,9 @@ def callback(data, darwin):
 	darwin.set_angles({"j_shoulder_r": shoulder_r})
 
 	darwin.set_angles({"j_high_arm_r": high_arm_r})
+
+	darwin.set_angles({"j_tilt": translate(head[2], 1.5, 2.0, -1, 1)})
+	darwin.set_angles({"j_pan": translate(head[1], -0.1, 0.1, -1, 1)})
 
 	if angle_elbow_to_hand_l > 1.75:
 		darwin.set_angles({"j_low_arm_l": 1.5})
