@@ -75,6 +75,7 @@ def callback(data, darwin):
 		if tr.child_frame_id.startswith('right_elbow'):
 			translation = tr.transform.translation
 			elbow_coord_r = (translation.y, translation.x, translation.z)
+			
 
 	relative_elbow_l = sub(shoulder_coord_l, elbow_coord_l)
 	relative_hand_l = sub(shoulder_coord_l, hand_coord_l)
@@ -94,6 +95,7 @@ def callback(data, darwin):
 	print('Angle2hand ', angle_elbow_to_hand_l)
 	print('Phi ', phi_elbow)
 	print('Theta ', theta_elbow)
+	print('HEAD: ', head)
 
 	elbow_to_axis_z_l = math.acos(relative_elbow_l[2] / math.sqrt(relative_elbow_l[0] ** 2 + relative_elbow_l[1] ** 2 + relative_elbow_l[2] ** 2)).real -0.25
 	elbow_to_axis_y_l = math.acos(relative_elbow_l[0] / math.sqrt(relative_elbow_l[0] ** 2 + relative_elbow_l[1] ** 2 + relative_elbow_l[2] ** 2)).real
@@ -108,7 +110,7 @@ def callback(data, darwin):
 	print('ELBOW_TO_Z: ', elbow_to_axis_z_l)
 	print('ELBOW_TO_Y: ', elbow_to_axis_y_l)
 
-	shoulder_l = -(3.14 - elbow_to_axis_y_l)
+	shoulder_l = (3.14 - elbow_to_axis_y_l)
 	high_arm_l = 1.57 - elbow_to_axis_z_l
 	shoulder_r = -(3.14 - elbow_to_axis_y_r)
 	high_arm_r = 1.57 - elbow_to_axis_z_r
@@ -127,11 +129,11 @@ def callback(data, darwin):
 	darwin.set_angles({"j_high_arm_r": high_arm_r})
 
 	if angle_elbow_to_hand_l > 1.75:
-		darwin.set_angles({"j_low_arm_l": -1.5})
+		darwin.set_angles({"j_low_arm_l": 1.5})
 	elif angle_elbow_to_hand_l < 0.25:
 		darwin.set_angles({"j_low_arm_l": 0})
 	else:
-		darwin.set_angles({"j_low_arm_l": -(angle_elbow_to_hand_l - 0.25)})
+		darwin.set_angles({"j_low_arm_l": (angle_elbow_to_hand_l - 0.25)})
 
 	if angle_elbow_to_hand_r > 1.75:
 		darwin.set_angles({"j_low_arm_r": -1.5})
