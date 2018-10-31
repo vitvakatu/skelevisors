@@ -5,13 +5,13 @@ Skeleton tracking using ROS
 Человек как инструмент
 
 # Цель
-Управление роботом (или не роботом) движениями (или не движениями) тела (или телами) человека (или не человека).
+Управление роботом движениями тела человека.
 
 # Используемые технологии
-- ROS Kinetic
-- Kinect (это не ROS Kinetic, это Kinect)
+- ROS Melodic
+- Kinect
 - OpenNI_tracker
-- NITE
+- [NITE](https://mega.nz/#!epNHBKzK!1-jcF_1tQtoYw9FSYmsKdPMqnPU2W-YdTJgA-f0ynnI)
 - Darwin robot
 - https://github.com/avin2/SensorKinect 
 
@@ -21,6 +21,7 @@ Skeleton tracking using ROS
 
 # Startup schedule
 ```
+roscore
 roslaunch openni_launch openni.launch device_id:=#2 depth_registration:=true
 rosrun openni_tracker openni_tracker
 roslaunch darwin_gazebo darwin_gazebo.launch
@@ -28,4 +29,4 @@ rosrun skelevisors subscriber.py
 ```
 
 # Описание
-Кажую неделю мы приходим на кафедру и пытаемся что-то запустить, используя устаревшие туториалы и копируя чужой код. В будущем, мы надеемся управлять роботом Darwin с помощью тела человека (используя Kinect). Надеемся успеть до конца семестра, но не гарантируем.
+Высокоточный манипулятор верхними конечностями и головой профессионального хирурга.
